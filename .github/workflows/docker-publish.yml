@@ -34,15 +34,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18' # Specify your project's Node.js version
-          cache: 'npm' # Or 'yarn', 'pnpm' depending on your package manager
+          cache: 'npm' # Or 'yarn', 'pnpm'
+          cache-dependency-path: client/package-lock.json # Assuming client is in 'client/' and uses npm
 
       - name: Install Client dependencies
-        # Assuming client is in a 'client' subdirectory or build happens at root
-        # working-directory: ./client # Optional: if client has its own package.json
+        # If your client project is in a 'client/' subdirectory
+        working-directory: ./client
         run: npm ci # Or yarn install --frozen-lockfile, pnpm install --frozen-lockfile
                   # 'ci' is generally preferred in CI environments for reproducibility
 
       - name: Build Client project
+        # If your client project is in a 'client/' subdirectory
+        working-directory: ./client
         run: npm run build # Or your specific build script, e.g., yarn build
         # env: # Optional: if your build script needs environment variables
         #   REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
@@ -81,7 +84,7 @@ jobs:
           cache-to: type=gha,mode=max # Enable build cache to GitHub Actions cache
 
       - name: Image digest
-        if: steps.build-and-push.outputs.digest && github.event_name != 'pull_request' && needs.build-and-push-client-image.outputs.digest
+        if: steps.build-and-push.outputs.digest && github.event_name != 'pull_request'
         run: |
           echo "Pushed Client image with digest: ${{ steps.build-and-push.outputs.digest }}"
 
