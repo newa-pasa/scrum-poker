@@ -1,0 +1,166 @@
+.game-room-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px); /* Adjust based on your header/footer height */
+  min-height: 500px;
+}
+
+.game-area {
+  display: flex;
+  flex-grow: 1;
+}
+
+.participants-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; Removed: children will stretch or be controlled individually */
+  /* justify-content: center; Removed: explicit areas will manage content */
+  padding: 20px;
+  /* position: relative; Removed: child .game-table-area will be relative context */
+}
+
+.game-table-area { /* New wrapper for the round table and participant avatars */
+  flex-grow: 1; /* Takes up available vertical space above estimates-bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* New positioning context for participant-wrapper */
+  width: 100%; /* Ensure it takes full width within participants-section padding */
+}
+.add-task-section {
+  width: 100%;
+  max-width: 500px; /* Or adjust as needed */
+  margin-bottom: 20px; /* Spacing below add task area */
+}
+
+.observers-section {
+  padding: 20px;
+  border-left: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+.observers-section h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #495057;
+}
+
+.round-table {
+  position: relative;
+  /* Width and height are set dynamically via inline styles in GameDetail.jsx */
+  /* Default/fallback values if needed, but JS will override */
+  /* width: 240px; */
+  /* height: 240px; */
+  border: 2px solid #6c757d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px; /* Space below the table */
+}
+
+.participant-wrapper {
+  position: absolute;
+  /* Width for positioning calculation is based on participantCardSize in JS */
+  /* Visual width will be determined by its content (card + name label) */
+  /* height: auto; by default */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* top and left are set dynamically via inline styles */
+}
+
+.participant-card { /* This is the circle, acting as a card */
+  width: 60px;  /* Matches participantCardSize in JS */
+  height: 60px; /* Matches participantCardSize in JS */
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  margin-bottom: 8px; /* Space between card and name */
+}
+
+.participant-card.voted {
+  background-color: #28a745; /* Green to indicate voted */
+  color: white;
+  font-size: 1.8em; /* Make checkmark larger */
+}
+
+.reveal-button-container {
+  /* Positioned in the center of .round-table by flex properties of .round-table */
+  z-index: 10;
+}
+
+.estimates-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  width: 100%;
+  /* margin-top: auto; Removed: Now it's the last flex item in a column */
+}
+
+.estimate-card {
+  min-width: 45px;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid #adb5bd;
+}
+
+.estimate-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.estimate-card.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.observer-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+.observer-item:last-child {
+  border-bottom: none;
+}
+
+.participant-initials {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.participant-name-label {
+  font-size: 0.85em;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px; /* Adjust to prevent long names from breaking layout too much */
+  text-align: center;
+}
+
+.task-item {
+  padding: 10px 0; /* Consistent padding with observer items */
+}
+
+.task-name {
+  font-weight: 500;
+}

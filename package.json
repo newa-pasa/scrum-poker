@@ -1,0 +1,16 @@
+{
+  "name": "simple-game-app",
+  "version": "1.0.0",
+  "description": "A simple Node.js and Express app for listing and joining games.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.6",
+    "express": "^4.18.2",
+    "reactstrap": "^9.2.3",
+    "socket.io": "^4.8.1"
+  }
+}
