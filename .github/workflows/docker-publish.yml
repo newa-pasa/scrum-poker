@@ -1,0 +1,147 @@
+name: Docker Build and Release
+
+on:
+  push:
+    branches:
+      - main 
+    tags:
+      - 'v*.*.*' 
+  pull_request:
+    branches:
+      - main 
+
+jobs:
+  build-and-push-server-image:
+    name: Build and Push Server Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    # needs: build-and-push-client-image # Optional: if server build depends on client, or just for ordering
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+        
+      - name: Set up Node.js for Server
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json 
+      - name: Install Server Dependencies
+        working-directory: ./server 
+        run: npm ci --only=production
+      # - name: Build Server
+      #   working-directory: ./server
+      #   run: npm run build 
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata for Server
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/server
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=tag
+
+      - name: Build and push Server Docker image
+        id: build-and-push-server
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server 
+          file: ./server/Dockerfile 
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Server Image digest
+        if: steps.build-and-push-server.outputs.digest && github.event_name != 'pull_request'
+        run: |
+          echo "Pushed Server image with digest: ${{ steps.build-and-push-server.outputs.digest }}"
+  
+  build-and-push-client-image:
+    name: Build and Push Client Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # To checkout the repository
+      packages: write # To push packages to GitHub Container Registry
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Optional: Set up QEMU for multi-platform builds (e.g., arm64)
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        # Enables more advanced build features like multi-platform builds and caching
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' 
+          cache: 'npm' 
+          cache-dependency-path: client/package-lock.json 
+
+      - name: Install Client dependencies
+        working-directory: ./client
+        run: npm ci 
+
+      - name: Build Client project
+        working-directory: ./client
+        run: npm run build 
+        #   REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }} # Your GitHub username or organization
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions automatically provides this token
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/client # e.g., ghcr.io/your-username/your-repo-name/client
+          tags: |
+            # Tag 'latest' for pushes to the default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Tag with the Git SHA (short format)
+            type=sha,prefix=,suffix=,format=short
+            # Tag with the Git tag if this is a tag event (e.g., v1.0.0)
+            type=ref,event=tag
+
+      - name: Build and push Client Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./client
+          file: ./client/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }} # Only push if not a pull request
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha # Enable build cache from GitHub Actions cache
+          cache-to: type=gha,mode=max # Enable build cache to GitHub Actions cache
+
+      - name: Image digest
+        if: steps.build-and-push.outputs.digest && github.event_name != 'pull_request'
+        run: |
+          echo "Pushed Client image with digest: ${{ steps.build-and-push.outputs.digest }}"
