@@ -40,7 +40,7 @@ RUN chown -R appuser:appgroup /usr/src/app
 USER appuser
 
 # Expose the port your server runs on
-EXPOSE 3000 # Replace 3000 with your server's actual port if different
+EXPOSE 3000 
 
 # Add HEALTHCHECK to allow Docker to verify container health.
 # This example uses Node.js to make an HTTP GET request to '/health' on localhost.
