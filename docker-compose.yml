@@ -1,0 +1,32 @@
+name: scrum-poker
+services:
+  client:
+    image: ghcr.io/newa-pasa/scrum-poker/client:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+    networks:
+      - scrum-poker-net
+
+  server:
+    image: ghcr.io/newa-pasa/scrum-poker/server:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - scrum-poker-net
+    # If your server needs persistent storage, uncomment and configure volumes:
+    # volumes:
+    #   - server_data:/app/data # Example: maps a named volume to /app/data in container
+
+networks:
+  scrum-poker-net:
+    driver: bridge
+
+# If you used named volumes, define them here:
+# volumes:
+#   server_data:
