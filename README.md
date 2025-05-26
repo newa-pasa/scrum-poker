@@ -36,12 +36,19 @@ scrum-poker/
     ```
 
 2.  **Set up the Server:**
-    *   Navigate to the project root directory (where `server.js` is located).
+    *   Navigate to the `server` directory:
+        ```bash
+        cd server
+        ```
     *   Install backend dependencies:
         ```bash
         npm install
         # or
         yarn install
+        ```
+    *   Go back to the project root directory:
+        ```bash
+        cd ..
         ```
 
 3.  **Set up the Client:**
@@ -112,3 +119,25 @@ To create a production build of the React client:
     yarn build
     ```
     This will create an optimized static build in the `client/build` folder. The `server.js` is already configured to serve these static files if it detects a production environment (though this setup might need further refinement for a robust production deployment).
+
+## Running the Application with Docker Compose
+
+This is the recommended way to run the application for a consistent environment, especially for development mimicking production or for deployment.
+
+**Prerequisites:**
+*   Docker
+*   Docker Compose
+
+**Steps:**
+
+1.  **Ensure Docker images are built and pushed to the registry** specified in `docker-compose.yml` (e.g., `ghcr.io/newa-pasa/scrum-poker/client:latest` and `ghcr.io/newa-pasa/scrum-poker/server:latest`). If you have local Dockerfiles for client and server, you can also build them locally using `docker-compose build`.
+
+2.  **Start the application:**
+    *   From the project root directory (`scrum-poker/`), run:
+        ```bash
+        docker-compose up -d
+        ```
+
+3.  **Access the Application:**
+    *   Client (Frontend): Open your web browser and go to `http://localhost:8080` (as mapped in `docker-compose.yml`).
+    *   Server (Backend API): Accessible via the client proxy. The server container itself is mapped to host port `3000` (e.g., `http://localhost:3000/api/...` if accessed directly, but typically accessed through the client at `http://localhost:8080/api/...`).
