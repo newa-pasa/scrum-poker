@@ -7,7 +7,7 @@ WORKDIR /usr/share/nginx/html
 # Remove default Nginx welcome page and any other default assets
 RUN rm -rf ./*
 
-COPY ./build/ ./
+COPY ./dist/ ./
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Nginx listens on port 80 by default

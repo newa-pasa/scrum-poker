@@ -29,7 +29,4 @@ COPY . .
 EXPOSE 3000 
 
 # Define the command to run your app
-# This could be "node your-main-script.js" or "npm start"
-CMD [ "npm", "start" ]
-# Or, if you have a specific entry point:
-# CMD [ "node", "server.js" ]
+CMD [ "node", "server.js" ]
